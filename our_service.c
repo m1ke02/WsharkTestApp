@@ -35,7 +35,7 @@ static void on_ble_write(ble_os_t * p_our_service, ble_evt_t * p_ble_evt)
         // Get data
         sd_ble_gatts_value_get(p_our_service->conn_handle, p_our_service->leds_char_handles.value_handle, &rx_data);
 		// control LEDs
-		our_leds_char_update(data_buffer != 0);
+		our_leds_char_update(data_buffer);
     }
 	// Check if CCCD has been written
     else if(p_ble_evt->evt.gatts_evt.params.write.handle == p_our_service->buttons_char_handles.cccd_handle)
@@ -233,8 +233,19 @@ void our_buttons_char_update(ble_os_t *p_our_service, int32_t *value)
 // Function to be called when updating LEDS characteristic value
 void our_leds_char_update(int32_t value)
 {
-	if (value != 0)
-		bsp_indication_set(BSP_INDICATE_USER_STATE_1);
-	else
-		bsp_indication_set(BSP_INDICATE_USER_STATE_0);
+	switch(value & 0x3)
+	{
+		case 0:
+			bsp_indication_set(BSP_INDICATE_USER_STATE_OFF);
+			break;
+		case 1:
+			bsp_indication_set(BSP_INDICATE_USER_STATE_0);
+			break;
+		case 2:
+			bsp_indication_set(BSP_INDICATE_USER_STATE_1);
+			break;
+		case 3:
+			bsp_indication_set(BSP_INDICATE_USER_STATE_ON);
+			break;
+	}
 }
