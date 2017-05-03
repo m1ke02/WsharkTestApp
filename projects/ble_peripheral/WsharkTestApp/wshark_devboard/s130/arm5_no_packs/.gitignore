@@ -1,1 +1,2 @@
 _build
+!_build/nrf51822_xxAA.hex
